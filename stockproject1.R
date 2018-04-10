@@ -14,8 +14,8 @@ FNCL<-last(FNCL,"5 years")
 library(highcharter)
 #Highcharter charts are look really good on the eyes
 highchart(type = "stock") %>% hc_add_series(JPM,type="ohlc") %>% 
-  hc_add_series(XLF,type="line") %>% hc_add_series(FNCL, type="line") %>%
-  hc_add_series(IYF, type="line")
+  hc_add_series(XLF,type="ohlc") %>% hc_add_series(FNCL, type="ohlc") %>%
+  hc_add_series(IYF, type="ohlc") %>% hc_legend(enabled=TRUE)
 #If you would like candlecharts, susbstitute type="line" with type="ohlc"
 #Its not a good idea to build a model based on the prices themselves.
 #Time series data tends to be correlated in time and in turn exhibits significant autocorrelation
@@ -66,7 +66,7 @@ model_df = data.frame(class,rsiFNCL,rsiIYF,rsiXLF,adxFNCL$ADX,adxIYF$ADX,adxXLF$
 model=data.matrix(model_df)
 library(psych)
 fa.parallel(model[,-1], fa ="pc", n.iter = 100, show.legend = FALSE, main = "Scree Plot With Parallel Analysis")
-princicomp <- principal(model[,-1], nfactors = 4)
+princicomp <- principal(model[,-1], nfactors = 2)
 princicomp
 model=na.omit(model)
 colnames(model)=c("class","rsiFNCL","rsiIYF","rsiXLF","adxFNCL","adxIYF","adxXLF","trendfncl","trendiyf","trendxlf")
@@ -86,7 +86,7 @@ Y_test=testdata[,1]
 #Time to start XGBoost
 set.seed(3213)
 dtrain=xgb.DMatrix(data = X_train, label=Y_train)
-xgmodel=xgboost(data=dtrain, nround=20, objective="binary:logistic")
+xgmodel=xgboost(data=dtrain, nround=10, objective="binary:logistic")
 set.seed(27)
 model_xgb_pca <-train(outcome ~ .,
                       data=val_train_data,
@@ -95,9 +95,9 @@ model_xgb_pca <-train(outcome ~ .,
                       trControl = trainControl(method = "repeatedcv", number = 5, repeats = 10, verboseIter = FALSE))
 #Use cross validation
 dtrain=xgb.DMatrix(data = X_train, label=Y_train)
-cv=xgb.cv(data = dtrain, nround=20, nfold = 5, objective="binary:logistic")
+cv=xgb.cv(data = dtrain, nround=10, nfold = 5, objective="binary:logistic")
 preds=predict(xgmodel,X_test)
-prediction=as.numeric(preds>0.5)
+prediction=as.numeric(preds>0.543)
 #Find AUC for this
 library(pROC)
 auc<-auc(Y_test,prediction)
@@ -137,3 +137,17 @@ getknnerr <-function(n, traindata, testdata, trainresp, testresp) {
   return(ncount)
 }
 knn<-getknnerr(10, traindata = X_train, testdata = X_test,trainresp = Y_train,testresp = Y_test)
+
+knnreturn <- knn(X_train, X_test, Y_train, k=8)
+tablesamp <- table(knnreturn, Y_test)
+tablesamp
+knnreturn <- sapply(knnreturn, as.numeric)
+rocg <- roc(Y_test,knnreturn)
+plot(rocg)
+aucsc <- auc(Y_test,knnreturn)
+aucsc
+library(DiagrammeR)
+xgb.plot.tree(model = xgmodel)
+
+# View only the first tree in the XGBoost model
+xgb.plot.tree(model = xgmodel, n_first_tree = 1)
