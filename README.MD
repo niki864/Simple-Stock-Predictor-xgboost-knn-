@@ -34,7 +34,7 @@ The following chart was generated using highcharter.
 
 <img src="https://user-images.githubusercontent.com/10093954/38693940-69c9763c-3e56-11e8-809c-bc00ef322693.jpeg" alt="Drawing" style="width:100%;"/>
 
-Check out the whole chart [here](chart.html)
+Check the chart [here](chart.html)
 
 
 ## Prediction Model Description
@@ -49,12 +49,15 @@ One way we can go about doing this is differencing the data. But since this is f
 Some of the indicators, we have used are:
 
 RSI - Relative Stregth Index (A measure of how the stock performed scaled to 0-100 w.r.t the Weighted Moving Average)
+
 <img src="https://user-images.githubusercontent.com/10093954/38693864-2e6c6ec8-3e56-11e8-8cfa-2ee493b11bf8.jpeg" alt="Drawing" style="width:100%;"/>
 
 ADX - Average Directional Indicator
+
 <img src="https://user-images.githubusercontent.com/10093954/38693863-2e5a0e36-3e56-11e8-9631-022569cf1f49.jpeg" alt="Drawing" style="width:100%;"/>
 
 Parabolic SAR Trend- Stop and Reverse Indicator
+
 <img src="https://user-images.githubusercontent.com/10093954/38693862-2e4c9d50-3e56-11e8-8e17-0b62341996a6.jpeg" alt="Drawing" style="width:100%;"/>
 
 After munging out all the numbers for the indicators, we then feed it into our model. We also incorporate a lag of 1 day to avoid a lookahead bias on the data.
