@@ -1,3 +1,4 @@
+"Term Project For IE 7275: Data Mining for Engineers"
 library(xgboost)
 library(quantmod)
 library(TTR)
@@ -15,7 +16,7 @@ library(highcharter)
 #Highcharter charts are look really good on the eyes
 highchart(type = "stock") %>% hc_add_series(JPM,type="ohlc") %>% 
   hc_add_series(XLF,type="ohlc") %>% hc_add_series(FNCL, type="ohlc") %>%
-  hc_add_series(IYF, type="ohlc") %>% hc_legend(enabled=TRUE)
+  hc_add_series(IYF, type="ohlc") %>% hc_legend(enabled=TRUE) %>% hc_title(text="OHLC Prices For The Last 5 Years")
 #If you would like candlecharts, susbstitute type="line" with type="ohlc"
 #Its not a good idea to build a model based on the prices themselves.
 #Time series data tends to be correlated in time and in turn exhibits significant autocorrelation
@@ -47,7 +48,7 @@ sarXLF <- SAR(XLF[,c("XLF.High","XLF.Low")], accel = c(0.02, 0.2))
 trendxlf=XLF$XLF.Close-sarXLF
 plot(trendxlf)
 #Induce a lag to avoid look ahead bias
-"rsiFNCL=c(NA,head(rsiFNCL,-1))
+rsiFNCL=c(NA,head(rsiFNCL,-1))
 rsiIYF=c(NA,head(rsiIYF,-1))
 rsiXLF=c(NA,head(rsiXLF,-1))
 adxFNCL$ADX=c(NA,head(adxFNCL$ADX,-1))
@@ -55,11 +56,12 @@ adxIYF$ADX=c(NA,head(adxIYF$ADX,-1))
 adxXLF$ADX=c(NA,head(adxXLF$ADX,-1))
 trendfncl=c(NA,head(trendfncl,-1))
 trendiyf=c(NA,head(trendiyf,-1))
-trendxlf=c(NA,head(trendxlf,-1))"
+trendxlf=c(NA,head(trendxlf,-1))
 #Objective is to predict up or down on the daily price
 #A clear binary classification problem
 #Create the response variable
 price=JPM$JPM.Close-JPM$JPM.Open
+price=c(NA,head(price,-1))
 class=ifelse(price > 0,1,0)
 #Combine input features into a matrix
 model_df = data.frame(class,rsiFNCL,rsiIYF,rsiXLF,adxFNCL$ADX,adxIYF$ADX,adxXLF$ADX,trendfncl,trendiyf,trendxlf)
@@ -107,6 +109,9 @@ plot(rocg, col="blue")
 tablesamp <- table(prediction, Y_test)
 tablesamp
 library(class)
+#Let's run another classification algorithm to test if our data is valid.
+#This is a small script I wrote to automate and test for accuracy for up to
+#k cases of KNN classification.
 "Enter number of cases you wanna test for training data, 
 testdata, trainresponse and testresponse"
 #Testing for accuracy which is TP + TN/ Total No. of Test Cases
@@ -136,18 +141,19 @@ getknnerr <-function(n, traindata, testdata, trainresp, testresp) {
   tablen
   return(ncount)
 }
+#The function returns the k value with the highest accuracy.
 knn<-getknnerr(10, traindata = X_train, testdata = X_test,trainresp = Y_train,testresp = Y_test)
-
-knnreturn <- knn(X_train, X_test, Y_train, k=8)
+knnreturn <- knn(X_train, X_test, Y_train, k=knn)
 tablesamp <- table(knnreturn, Y_test)
 tablesamp
 knnreturn <- sapply(knnreturn, as.numeric)
+#Plot roc curve
 rocg <- roc(Y_test,knnreturn)
 plot(rocg)
 aucsc <- auc(Y_test,knnreturn)
 aucsc
+#This library helps us visualise the xgboost trees
 library(DiagrammeR)
 xgb.plot.tree(model = xgmodel)
-
 # View only the first tree in the XGBoost model
 xgb.plot.tree(model = xgmodel, n_first_tree = 1)
