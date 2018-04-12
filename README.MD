@@ -34,7 +34,7 @@ The following chart was generated using highcharter.
 
 <img src="https://user-images.githubusercontent.com/10093954/38693940-69c9763c-3e56-11e8-809c-bc00ef322693.jpeg" alt="Drawing" style="width:100%;"/>
 
-Check the chart [here](chart.html)
+Download the chart [here](chart.html)
 
 
 ## Prediction Model Description
