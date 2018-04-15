@@ -42,6 +42,8 @@ Download the chart [here](chart.html)
 
 Our goal in this project is to use ETFs to predict the value of one composite stock. The premise for this is that, we can think of an ETF as a representative for the entire industry. Banking and financial firms are all pretty much correlated to each other as even a minor policy change could potentially affect all of them. Thus, by using the performance of the ETF to train our Machine Learning models, we can arrive at a healthy and reasonable prediction for target stock : __JP Morgan(JPM)__
 
+__Note:__ _This a stock prediction project done as part of a term assignment and clearly, is not to be taken as sound investment advice. Predicting stock prices in the market is more challenging and requires enormous effort and way more degrees and qualifications than what we currently have :) Cheers!
+
 One common mistake in using time series data is that the data tends to exhibit seasonality and to arrive at an accurate measure, we need to convert it into a stationary data. Check out this article by Vegard Flovik where he talks more about this [https://www.linkedin.com/pulse/how-use-machine-learning-time-series-forecasting-vegard-flovik-phd/](https://www.linkedin.com/pulse/how-use-machine-learning-time-series-forecasting-vegard-flovik-phd/)
 
 One way we can go about doing this is differencing the data. But since this is financial data, the _quantmod_ package has a lot technical indicator functions which we can use to generate indicator data that more or less gets rid of seasonality.
